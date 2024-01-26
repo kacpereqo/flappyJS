@@ -1,7 +1,12 @@
 <template>
   <main>
-    <canvas ref="canvas" width="500" height="500" />
-    <img src="@/public/game/base.png" />
+    <div class="canvas">
+      <canvas ref="canvas" width="500" height="500" />
+      <img src="@/public/game/base.png" />
+    </div>
+    <div id="chat-container">
+      <ul id="chat"></ul>
+    </div>
   </main>
 </template>
 
@@ -24,6 +29,18 @@ canvas {
 }
 
 main {
+  display: flex;
+  gap: 20px;
+}
+
+#chat-container {
+  width: 300px;
+  height: 500px;
+  border: 1px solid black;
+  overflow-y: scroll;
+}
+
+.canvas {
   display: flex;
   flex-direction: column;
 }

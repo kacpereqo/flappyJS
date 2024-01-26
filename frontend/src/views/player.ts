@@ -19,6 +19,8 @@ export class Player {
     sprite: HTMLImageElement;
 
     lastTimeJumped: number;
+
+    playerId: number;
     
     angle: number;
     hitbox: boolean;
@@ -31,7 +33,14 @@ export class Player {
 
     webSocket: SocketConnection | null;
  
-    constructor() {
+    constructor(id:number | null = null) {
+
+        if (id) {
+            this.playerId = id;
+        } else {
+            this.playerId = Math.floor(Math.random() * 1000000);
+        }
+
         this.x = -200;
         this.y = 0;
         this.angle = Math.PI/2;
@@ -66,7 +75,7 @@ export class Player {
     }
 
     connect(): void {
-        this.webSocket = SocketConnection.getInstance();
+        this.webSocket = SocketConnection.getInstance(this.playerId);
     }
 
     update(dt:number): void {
@@ -144,6 +153,7 @@ export class Player {
     }
 
     reset(): void {
+        
         this.x = -200;
         this.y = 0;
         this.angle = Math.PI/2;
@@ -177,6 +187,8 @@ export class Player {
         this.score++;
         this.webSocket?.sendScore(this.score);
     }
+
+
 
   };
 

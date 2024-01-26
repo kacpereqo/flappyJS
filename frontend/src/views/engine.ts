@@ -27,10 +27,11 @@ export class Engine{
         this.pipes = [];
         this.timeouts = [];
         this.canvas = canvas;
-        
-        this.websocket = SocketConnection.getInstance();
-        
         this.mainPlayer = new Player();
+
+        this.websocket = SocketConnection.getInstance(this.mainPlayer.playerId);
+        this.listenOnSocket();
+        
         this.mainPlayer.connect();
     }
 
@@ -48,6 +49,44 @@ export class Engine{
             }, 1000 / 120);
           }
     }
+
+    listenOnSocket(): void {
+      const chatContainer = document.getElementById("chat-container");
+      const chat = document.getElementById("chat");
+        
+      if (!this.websocket) return;
+      if (!chat) return;
+
+       this.websocket.webSocket.onmessage = (event) => { 
+        const data = JSON.parse(event.data);
+
+        chat.innerHTML += `<li>${data.id}: ${data.type}</li>`;
+        chatContainer
+
+        if (data.type === "join") {
+          if (data.id !== this.mainPlayer.playerId) {
+          this.players?.push(new Player(data.id));
+        }
+       }
+       if  (data.type === "disconnect") { 
+        this.players?.forEach((player) => {
+          if (player.playerId === data.id) {
+            this.players?.splice(this.players.indexOf(player), 1);
+          }
+        });
+       }
+       if (data.type === "jump") {
+        this.players?.forEach((player) => {
+          if (player.playerId === data.id) {
+            player.jump();
+          }
+        });
+      }
+      if (data.type === "dead") {
+        this.reset();
+      }
+    }
+  }
 
     renderBackground(canvas: HTMLCanvasElement) {
         const ctx = canvas.getContext("2d");
@@ -106,7 +145,11 @@ export class Engine{
     }
 
     reset(): void {
-        this.mainPlayer.reset();
+        
+      const players =  [...this.players, this.mainPlayer];
+
+        players.forEach((player) => player.reset());
+
         this.pipes = [];
         this.timeouts.forEach((timeout) => clearTimeout(timeout));
         
@@ -116,7 +159,14 @@ export class Engine{
     update(): void {
 
         // --- Player --- //
-        this.mainPlayer.update(this.dt);
+
+        // @ts-ignore
+        const players =  [...this.players, this.mainPlayer];
+
+        for (const player of players) {
+            player.update(this.dt);
+        }
+
 
         // --- Pipes --- // 
         for (const pipe of this.pipes) {
@@ -129,6 +179,7 @@ export class Engine{
         // --- Player Collision--- //
         for (const pipe of this.pipes) {
           if (pipe.collide(this.mainPlayer)) {
+            this.mainPlayer.webSocket?.sendDead();
             this.reset();
             break;
           } else if (pipe.x < this.mainPlayer.x && !pipe.passed) {
