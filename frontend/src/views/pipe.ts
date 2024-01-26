@@ -43,7 +43,7 @@ export class Pipe{
     }
 
     isOutOfScreen(): boolean {
-        return this.x < -this.sizeX;
+        return this.x < -250 - this.sizeX;
     }
 
     collide(player: Player){

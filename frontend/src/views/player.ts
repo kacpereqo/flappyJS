@@ -26,6 +26,8 @@ export class Player {
 
     dead: boolean;
 
+    keyDown: boolean;
+
     constructor() {
         this.x = -200;
         this.y = 0;
@@ -54,6 +56,8 @@ export class Player {
         this.score  = 0;
         
         this.dead = false;
+
+        this.keyDown = false;
     }
 
     update(dt:number): void {
@@ -111,9 +115,17 @@ export class Player {
         ctx?.restore();
     }
 
-    dead(): void{
-        this.velocity = 0;
-        this.acceleration = 0;
+    controls(): void {
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowUp" && !this.keyDown) {
+              this.jump();
+            }
+          });
+          window.addEventListener("keyup", (e) => {
+            if (e.key === "ArrowUp") {
+              this.keyDown = false;
+            }
+          });
     }
 
     reset(): void {
@@ -144,6 +156,10 @@ export class Player {
         this.score  = 0;
         
         this.dead = false;
+    }
+
+    addScore(): void {
+        this.score++;
     }
 
   };
