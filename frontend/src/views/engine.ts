@@ -1,5 +1,6 @@
 import { Player } from "./player";
 import { Pipe } from "./pipe";
+import { SocketConnection } from "./websockets";
 import backgroundImage from "@/public/game/background-day.png";
 
 const background = new Image();
@@ -16,16 +17,21 @@ export class Engine{
 
     timeouts: any[];
     canvas: HTMLCanvasElement;
+    websocket: SocketConnection | null;
 
     constructor(canvas: HTMLCanvasElement){
         this.dt = 1/60;
         this.clock = 0;
 
-        this.mainPlayer = new Player();
         this.players = [];
         this.pipes = [];
         this.timeouts = [];
         this.canvas = canvas;
+        
+        this.websocket = SocketConnection.getInstance();
+        
+        this.mainPlayer = new Player();
+        this.mainPlayer.connect();
     }
 
     input(): void {
@@ -60,7 +66,6 @@ export class Engine{
         }
       }
       
-
     renderScore(canvas: HTMLCanvasElement) {
         const ctx = canvas.getContext("2d");
         if (!ctx || !canvas) return;
@@ -82,6 +87,7 @@ export class Engine{
       
         ctx?.translate(this.canvas.width / 2, this.canvas.height / 2);
       
+        // @ts-ignore
         const players =  [...this.players, this.mainPlayer];
         
         players.forEach((player) => player.render(this.canvas));
@@ -109,6 +115,7 @@ export class Engine{
 
     update(): void {
 
+        // --- Player --- //
         this.mainPlayer.update(this.dt);
 
         // --- Pipes --- // 

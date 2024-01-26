@@ -1,6 +1,7 @@
 import downflap from '../public/game/bluebird-downflap.png'
 import midflap from '../public/game/bluebird-midflap.png'
 import upflap from '../public/game/bluebird-upflap.png'
+import { SocketConnection } from './websockets';
 
 export class Player {
     x: number;
@@ -28,6 +29,8 @@ export class Player {
 
     keyDown: boolean;
 
+    webSocket: SocketConnection | null;
+ 
     constructor() {
         this.x = -200;
         this.y = 0;
@@ -58,6 +61,12 @@ export class Player {
         this.dead = false;
 
         this.keyDown = false;
+
+        this.webSocket = null;
+    }
+
+    connect(): void {
+        this.webSocket = SocketConnection.getInstance();
     }
 
     update(dt:number): void {
@@ -76,6 +85,10 @@ export class Player {
     }
 
     jump():void{
+        if (this.webSocket){
+            this.webSocket.sendJump(this.y);
+        }
+
         this.lastTimeJumped = Date.now();
         this.velocity = -400
     }
@@ -118,6 +131,7 @@ export class Player {
     controls(): void {
         window.addEventListener("keydown", (e) => {
             if (e.key === "ArrowUp" && !this.keyDown) {
+                this.keyDown = true;
               this.jump();
             }
           });
@@ -126,6 +140,7 @@ export class Player {
               this.keyDown = false;
             }
           });
+
     }
 
     reset(): void {
@@ -160,6 +175,7 @@ export class Player {
 
     addScore(): void {
         this.score++;
+        this.webSocket?.sendScore(this.score);
     }
 
   };
