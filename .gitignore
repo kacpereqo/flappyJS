@@ -32,3 +32,6 @@ coverage
 ./pycache
 .venv
 .vscode
+
+__pycache__/
+*.pyc
