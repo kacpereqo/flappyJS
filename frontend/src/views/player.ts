@@ -75,7 +75,7 @@ export class Player {
     }
 
     connect(): void {
-        this.webSocket = SocketConnection.getInstance(this.playerId);
+        this.webSocket = SocketConnection.getInstance();
     }
 
     update(dt:number): void {

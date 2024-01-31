@@ -1,48 +1,71 @@
 <template>
   <main>
-    <div class="canvas">
-      <canvas ref="canvas" width="500" height="500" />
-      <img src="@/public/game/base.png" />
-    </div>
-    <div id="chat-container">
-      <ul id="chat"></ul>
-    </div>
+    <form action="/player" @submit.prevent="onSubmit">
+      <input
+        type="text"
+        name="name"
+        placeholder="Enter your name"
+        ref="nickInput"
+      />
+      <input
+        type="text"
+        name="serverAdress"
+        placeholder="Enter server adress"
+        ref="serverAdressInput"
+      />
+
+      <input
+        type="text"
+        name="roomId"
+        placeholder="Enter room id"
+        ref="roomIdInput"
+      />
+
+      <input type="submit" value="Submit" />
+    </form>
   </main>
 </template>
 
 <script setup lang="ts">
+import { userStore } from "@/stores/user";
+import { useRouter } from "vue-router";
+import { websocketStore } from "@/stores/websocket";
 import { ref } from "vue";
-import { onMounted } from "vue";
-import { Engine } from "./engine";
 
-const canvas = ref<HTMLCanvasElement | null>(null);
+const router = useRouter();
+const user = userStore();
+const websocket = websocketStore();
 
-onMounted(() => {
-  const engine = new Engine(canvas?.value!);
-  engine.gameLoop();
-});
+const serverAdressInput = ref<HTMLInputElement | null>(null);
+const nickInput = ref<HTMLInputElement | null>(null);
+const roomIdInput = ref<HTMLInputElement | null>(null);
+
+function onSubmit() {
+  user.nickname = nickInput.value?.value!;
+  websocket.adress = serverAdressInput.value?.value!;
+
+  router.push({
+    name: "game",
+    params: {
+      roomId: roomIdInput.value?.value!,
+    },
+  });
+}
 </script>
 
 <style>
-canvas {
+form {
   border: 1px solid black;
+  padding: 20px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 main {
-  display: flex;
-  gap: 20px;
-}
-
-#chat-container {
-  width: 300px;
-  height: 500px;
-  border: 1px solid black;
-  overflow-y: scroll;
-}
-
-.canvas {
-  display: flex;
-  flex-direction: column;
+  margin-top: 300px;
 }
 </style>
-@/views/player

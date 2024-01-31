@@ -1,34 +1,37 @@
+import { websocketStore } from "../stores/websocket";
+import { userStore } from "../stores/user";
+
 export class SocketConnection {
     private static instance: SocketConnection;
     public webSocket: WebSocket;
-    public id: number;
-    public roomId: number;
+    public userStore: any;
 
-    private constructor(id:number) {
-        this.id = id;
-        this.roomId = 1;
-        this.webSocket = new WebSocket(`ws://localhost:8000/ws/${this.roomId}/${this.id}`);
+    private constructor() {
+        const store = websocketStore();
+        this.userStore = userStore();
+        this.webSocket = new WebSocket(store.getAdress());
         
         this.webSocket.onopen = () => {
             this.sendJoin();
         }
     }
 
-    public static getInstance(id:number): SocketConnection {
+    public static getInstance(): SocketConnection {
         if (!SocketConnection.instance) {
-            SocketConnection.instance = new SocketConnection(id);
+            SocketConnection.instance = new SocketConnection();
         }
 
         return SocketConnection.instance;
     }
 
     private send(message: any) {
-        message.id = this.id;
+        message.id = this.userStore.id;
         this.webSocket.send(JSON.stringify(message));
     }
 
     private sendJoin() {
-        this.send({type: "join"});
+        console.log(this.userStore.nickname);
+        this.send({type: "join", nickname: this.userStore.nickname});
     }
 
     public sendJump(posY: number) {

@@ -29,7 +29,7 @@ export class Engine{
         this.canvas = canvas;
         this.mainPlayer = new Player();
 
-        this.websocket = SocketConnection.getInstance(this.mainPlayer.playerId);
+        this.websocket = SocketConnection.getInstance();
         this.listenOnSocket();
         
         this.mainPlayer.connect();

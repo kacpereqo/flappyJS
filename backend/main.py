@@ -33,42 +33,69 @@ manager = ConnectionManager()
 
 
 class Player:
-    def __init__(self, player_id: int):
+    def __init__(self, player_id: int, nickname: str = "guest"):
         self.player_id = player_id
+        self.nickname = nickname
+        self.score = 0
 
 
-players: dict[int, list[Player]] = {}
+class EventHandler:
+    @staticmethod
+    async def onJoin(websocket: WebSocket, room_id: int, parsed_data: dict):
+        client_id = parsed_data["id"]
+        nickname = parsed_data["nickname"]
 
-
-@app.websocket("/ws/{room_id}/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int, room_id: int):
-    await manager.connect(websocket)
-
-    if room_id not in players:
-        players[room_id] = []
-    players[room_id].append(Player(client_id))
-
-    try:
-        for player in players[room_id]:
+        for player in players[room_id].values():
             await manager.send_personal_message(
                 orjson.dumps({"type": "join", "id": player.player_id}).decode("utf-8"),
                 websocket,
             )
-        while True:
-            data = await websocket.receive_text()
-            print(data)
-            await manager.broadcast(data)
 
-    except WebSocketDisconnect:
+        players[room_id][client_id] = Player(client_id, nickname)
+
+    @staticmethod
+    async def onDisconnect(websocket, room_id: int, client_id: int):
         manager.disconnect(websocket)
+        del players[room_id][client_id]
 
-        players[room_id] = [
-            player for player in players[room_id] if player.player_id != client_id
-        ]
-        print(players)
         await manager.broadcast(
             orjson.dumps({"type": "disconnect", "id": client_id}).decode("utf-8")
         )
+
+
+players: dict[int, dict[int, Player]] = {}  # room_id: {player_id: Player}
+
+
+@app.websocket("/ws/{room_id}")
+async def websocket_endpoint(
+    websocket: WebSocket,
+    room_id: int,
+):
+    player = None
+
+    await manager.connect(websocket)
+    if room_id not in players:
+        players[room_id] = {}
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            parsed_data = orjson.loads(data)
+
+            print(data)
+
+            if parsed_data["type"] == "join":
+                await EventHandler.onJoin(websocket, room_id, parsed_data)
+                player = players[room_id][parsed_data["id"]]
+
+            # if parsed_data["type"] == "message":
+            #     EventHandler.onMessage(websocket, room_id, parsed_data)
+
+            await manager.broadcast(data)
+
+    # On disconnect
+    except WebSocketDisconnect:
+        await EventHandler.onDisconnect(websocket, room_id, player.player_id)
 
 
 if __name__ == "__main__":
