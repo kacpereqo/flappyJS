@@ -22,6 +22,8 @@ export class Player {
     lastTimeJumped: number;
 
     playerId: number;
+
+    nickname: string;
     
     angle: number;
     hitbox: boolean;
@@ -34,10 +36,17 @@ export class Player {
 
     webSocket: SocketConnection | null;
  
-    constructor() {
+    constructor(nickname: string = "guest", id : number | null = null) {
         const user = userStore();
         
-        this.playerId = user.id as number;
+        if (id) {
+            this.playerId = id;
+        }
+        else{
+            this.playerId = user.id as number;
+        }
+
+        this.nickname = nickname;
 
         this.x = -200;
         this.y = 0;

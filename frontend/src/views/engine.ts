@@ -65,7 +65,7 @@ export class Engine{
 
         if (data.type === "join") {
           if (data.id !== this.mainPlayer.playerId) {
-            this.players?.push(new Player(data.id));
+            this.players?.push(new Player(data.id, data.nickname));
         }
        }
        if  (data.type === "disconnect") { 
