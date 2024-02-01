@@ -2,6 +2,7 @@ import downflap from '../public/game/bluebird-downflap.png'
 import midflap from '../public/game/bluebird-midflap.png'
 import upflap from '../public/game/bluebird-upflap.png'
 import { SocketConnection } from './websockets';
+import { userStore } from '../stores/user';
 
 export class Player {
     x: number;
@@ -33,13 +34,10 @@ export class Player {
 
     webSocket: SocketConnection | null;
  
-    constructor(id:number | null = null) {
-
-        if (id) {
-            this.playerId = id;
-        } else {
-            this.playerId = Math.floor(Math.random() * 1000000);
-        }
+    constructor() {
+        const user = userStore();
+        
+        this.playerId = user.id as number;
 
         this.x = -200;
         this.y = 0;
