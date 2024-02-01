@@ -48,7 +48,14 @@ class EventHandler:
         for player in players[room_id].values():
             print(player.player_id)
             await manager.send_personal_message(
-                orjson.dumps({"type": "join", "id": player.player_id}).decode("utf-8"),
+                orjson.dumps(
+                    {
+                        "type": "join",
+                        "id": player.player_id,
+                        "nickname": player.nickname,
+                        "score": player.score,
+                    }
+                ).decode("utf-8"),
                 websocket,
             )
 
@@ -83,7 +90,7 @@ async def websocket_endpoint(
             data = await websocket.receive_text()
             parsed_data = orjson.loads(data)
 
-            print(parsed_data["type"], len(players[room_id]), room_id)
+            print(parsed_data)
 
             if parsed_data["type"] == "join":
                 await EventHandler.onJoin(websocket, room_id, parsed_data)

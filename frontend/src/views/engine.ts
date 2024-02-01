@@ -3,6 +3,7 @@ import { Pipe } from "./pipe";
 import { SocketConnection } from "./websockets";
 import backgroundImage from "@/public/game/background-day.png";
 import { playersStore } from "@/stores/players";
+import { userStore } from "@/stores/user";
 
 const background = new Image();
 background.src = backgroundImage;
@@ -21,23 +22,29 @@ export class Engine{
     websocket: SocketConnection | null;
 
     playersStore: any;
+    userStore: any;
 
     constructor(canvas: HTMLCanvasElement){
         this.dt = 1/60;
         this.clock = 0;
 
+        this.playersStore = playersStore();
+        this.userStore = userStore();
+
         this.players = [];
         this.pipes = [];
         this.timeouts = [];
         this.canvas = canvas;
-        this.mainPlayer = new Player();
+        this.mainPlayer = new Player(
+            this.userStore.nickname,
+            this.userStore.id
+        );
 
         this.websocket = SocketConnection.getInstance();
         this.listenOnSocket();
         
         this.mainPlayer.connect();
        
-        this.playersStore = playersStore();
         this.playersStore.addPlayer(this.mainPlayer);
     }
 
@@ -57,46 +64,47 @@ export class Engine{
     }
 
     listenOnSocket(): void {
-      const chatContainer = document.getElementById("chat-container");
-      const chat = document.getElementById("chat");
         
       if (!this.websocket) return;
-      if (!chat) return;
 
        this.websocket.webSocket.onmessage = (event) => { 
         const data = JSON.parse(event.data);
 
-        chat.innerHTML += `<li>${data.id}: ${data.type}</li>`;
-        chatContainer
 
-        if (data.type === "join") {
-          if (data.id !== this.mainPlayer.playerId) {
-            const newPlayer = new Player(data.id, data.nickname);
-            
-            this.players?.push(newPlayer);
-            this.playersStore.addPlayer(newPlayer);
-        }
-       }
-       if  (data.type === "disconnect") { 
-        this.players?.forEach((player) => {
-          if (player.playerId === data.id) {
+        switch (data.type) {
+          case "join":
+            if (data.id !== this.mainPlayer.playerId) {
+              this.players?.push(new Player( data.nickname, data.id));
+              this.playersStore.addPlayer({id: data.id, nickname: data.nickname, score: 0});
+            }
+          break;
 
-            this.players?.splice(this.players.indexOf(player), 1);
-            this.playersStore.removePlayer(data.id);
-          }
-        });
-       }
-       if (data.type === "jump") {
-        this.players?.forEach((player) => {
-          if (player.playerId === data.id) {
-            player.jump();
-          }
-        });
-      }
-      if (data.type === "dead") {
+          case "disconnect":
+            this.players?.forEach((player) => {
+              if (player.playerId === data.id) {
+
+                this.players?.splice(this.players.indexOf(player), 1);
+                this.playersStore.removePlayer(data.id);
+              }
+            });
+          break;
+
+          case "jump":
+            // console.log("jump", this.playerId);
+            this.players?.forEach((player) => {
+              console.log(player.playerId);
+              if (player.playerId === data.id) {
+                player.jump();
+              }
+            });
+          break;
+
+          case "dead":
         this.reset();
-      }
-    }
+        break;
+  }
+}
+
   }
 
     renderBackground(canvas: HTMLCanvasElement) {

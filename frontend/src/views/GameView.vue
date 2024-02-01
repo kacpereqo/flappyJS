@@ -5,7 +5,11 @@
       <div id="ground" />
     </div>
     <div id="chat-container">
-      <ul id="chat"></ul>
+      <ul id="chat">
+        <li v-for="player in usePlayerStore.players" :key="player.id">
+          {{ player.nickname }} | {{ player.score }}
+        </li>
+      </ul>
     </div>
   </main>
 </template>
@@ -14,6 +18,9 @@
 import { ref } from "vue";
 import { onMounted } from "vue";
 import { Engine } from "./engine";
+import { playersStore } from "@/stores/players";
+
+const usePlayerStore = playersStore();
 
 const canvas = ref<HTMLCanvasElement | null>(null);
 const canvasContainer = ref<HTMLDivElement | null>(null);

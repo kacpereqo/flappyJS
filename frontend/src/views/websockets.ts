@@ -20,12 +20,11 @@ export class SocketConnection {
         
         this.webSocket.onopen = () => {
             this.sendJoin();
-            SocketConnection.instance = null;
         }
     
         window.addEventListener("popstate", () => {
             this.webSocket.close();
-            console.log("closed");
+            SocketConnection.instance = null;
         });
     }
 
@@ -43,7 +42,6 @@ export class SocketConnection {
     }
 
     private sendJoin() {
-        console.log(this.userStore.nickname);
         this.send({type: "join", nickname: this.userStore.nickname});
     }
 
