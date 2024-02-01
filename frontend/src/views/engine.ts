@@ -112,6 +112,7 @@ export class Engine{
         ctx.font = "bold 48px sans-serif";
         ctx.fillStyle = "white";
         ctx.fillText(this.mainPlayer.score.toString(), 0, -canvas.height / 2 + 50);
+        // ctx.fillText(this.players.length.toString(), 0, -canvas.height / 2 + 50);
       
         ctx?.translate(-canvas.width / 2, -canvas.height / 2);
       }

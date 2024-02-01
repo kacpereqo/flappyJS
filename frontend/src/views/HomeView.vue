@@ -41,14 +41,14 @@ const nickInput = ref<HTMLInputElement | null>(null);
 const roomIdInput = ref<HTMLInputElement | null>(null);
 
 onMounted(() => {
-  serverAdressInput.value!.value = "ws://localhost:8000/ws/";
+  serverAdressInput.value!.value = "ws://localhost:8000/ws";
   nickInput.value!.value = "test";
   roomIdInput.value!.value = "1";
 });
 
 function onSubmit() {
   user.nickname = nickInput.value?.value!;
-  websocket.adress = serverAdressInput.value?.value!;
+  websocket.setAdress(serverAdressInput.value?.value!);
 
   router.push({
     name: "game",
