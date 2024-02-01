@@ -1,19 +1,32 @@
 import { websocketStore } from "../stores/websocket";
 import { userStore } from "../stores/user";
+import { useRoute } from "vue-router";
+import {watch } from 'vue';
+
 
 export class SocketConnection {
-    private static instance: SocketConnection;
+    
+    private static instance: SocketConnection|  null = null;
     public webSocket: WebSocket;
     public userStore: any;
 
     private constructor() {
+
+        console.log("constructor");
+
         const store = websocketStore();
         this.userStore = userStore();
         this.webSocket = new WebSocket(store.getAdress());
         
         this.webSocket.onopen = () => {
             this.sendJoin();
+            SocketConnection.instance = null;
         }
+    
+        window.addEventListener("popstate", () => {
+            this.webSocket.close();
+            console.log("closed");
+        });
     }
 
     public static getInstance(): SocketConnection {
