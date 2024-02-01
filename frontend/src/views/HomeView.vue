@@ -30,7 +30,7 @@
 import { userStore } from "@/stores/user";
 import { useRouter } from "vue-router";
 import { websocketStore } from "@/stores/websocket";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
 const router = useRouter();
 const user = userStore();
@@ -39,6 +39,12 @@ const websocket = websocketStore();
 const serverAdressInput = ref<HTMLInputElement | null>(null);
 const nickInput = ref<HTMLInputElement | null>(null);
 const roomIdInput = ref<HTMLInputElement | null>(null);
+
+onMounted(() => {
+  serverAdressInput.value!.value = "ws://localhost:8000/ws/";
+  nickInput.value!.value = "test";
+  roomIdInput.value!.value = "1";
+});
 
 function onSubmit() {
   user.nickname = nickInput.value?.value!;
