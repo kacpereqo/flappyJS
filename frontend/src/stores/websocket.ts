@@ -16,4 +16,4 @@ export const websocketStore = defineStore('websocket', () => {
     }
 
   return { getAdress, setAdress, _adress}
-})
+},{persist: true})

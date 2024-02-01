@@ -7,4 +7,4 @@ export const userStore = defineStore('user', () => {
   const id = ref<Number>(Math.round(Math.random() * 1000));
 
   return { nickname, id}
-})
+}, {persist: true})
