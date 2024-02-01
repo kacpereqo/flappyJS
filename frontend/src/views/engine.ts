@@ -2,6 +2,7 @@ import { Player } from "./player";
 import { Pipe } from "./pipe";
 import { SocketConnection } from "./websockets";
 import backgroundImage from "@/public/game/background-day.png";
+import { playersStore } from "@/stores/players";
 
 const background = new Image();
 background.src = backgroundImage;
@@ -19,6 +20,8 @@ export class Engine{
     canvas: HTMLCanvasElement;
     websocket: SocketConnection | null;
 
+    playersStore: any;
+
     constructor(canvas: HTMLCanvasElement){
         this.dt = 1/60;
         this.clock = 0;
@@ -33,6 +36,9 @@ export class Engine{
         this.listenOnSocket();
         
         this.mainPlayer.connect();
+       
+        this.playersStore = playersStore();
+        this.playersStore.addPlayer(this.mainPlayer);
     }
 
     input(): void {
@@ -65,13 +71,18 @@ export class Engine{
 
         if (data.type === "join") {
           if (data.id !== this.mainPlayer.playerId) {
-            this.players?.push(new Player(data.id, data.nickname));
+            const newPlayer = new Player(data.id, data.nickname);
+            
+            this.players?.push(newPlayer);
+            this.playersStore.addPlayer(newPlayer);
         }
        }
        if  (data.type === "disconnect") { 
         this.players?.forEach((player) => {
           if (player.playerId === data.id) {
+
             this.players?.splice(this.players.indexOf(player), 1);
+            this.playersStore.removePlayer(data.id);
           }
         });
        }
@@ -137,7 +148,7 @@ export class Engine{
       }
     addPipe(): any {
         return setInterval(() => {
-            this.pipes.push(new Pipe());
+            this.pipes.push(new Pipe(this.canvas));
             }, 2000);
       }
     
@@ -179,7 +190,7 @@ export class Engine{
       
         // --- Player Collision--- //
         for (const pipe of this.pipes) {
-          if (pipe.collide(this.mainPlayer)) {
+          if (pipe.collide(this.mainPlayer, this.canvas)) {
             this.mainPlayer.webSocket?.sendDead();
             this.reset();
             break;

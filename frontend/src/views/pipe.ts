@@ -13,13 +13,19 @@ export class Pipe{
 
     pipeImg: HTMLImageElement;
     reversedPipeImg: HTMLImageElement;
+    canvas : HTMLCanvasElement;
 
-    constructor() {
-        this.x = 250;
-        this.y = Math.floor(Math.random() * 200);
-
+    constructor(canvas: HTMLCanvasElement, posX : number | null = null) {
         this.sizeX = 52;
         this.sizeY = 320;
+
+        this.y = Math.floor(Math.random() * 200);
+        if (posX) {
+            this.x = posX;
+        }
+        else{
+            this.x = canvas.width/2 + this.sizeX ;
+        }
 
         this.pipeImg = new Image();
         this.pipeImg.src = pipeImg;
@@ -28,6 +34,8 @@ export class Pipe{
 
         this.reversedPipeImg = new Image();
         this.reversedPipeImg.src = reversedPipeImg;
+
+        this.canvas = canvas;
     }
 
     update(dt: number): void {
@@ -43,12 +51,12 @@ export class Pipe{
     }
 
     isOutOfScreen(): boolean {
-        return this.x < -250 - this.sizeX;
+        return this.x < -this.canvas.width/2  - this.sizeX;
     }
 
-    collide(player: Player){
+    collide(player: Player, canvas: HTMLCanvasElement): boolean {
         if (player.x + player.sizeX/2 > this.x && player.x < this.x + this.sizeX) {
-            if (player.y+player.sizeY > this.y || player.y < this.y - 200) {
+            if (player.y+player.sizeY > this.y || player.y < this.y - 200  ) {
                 return true;
             }
         }
