@@ -5,9 +5,10 @@ export class Random {
      static modulus = 65537;
      static increment= 74;
 
-  static random(start: number, end: number): number {
+  static random(start: number = 0, end: number = 65537): number {
+
     Random.lastValue = (Random.multipier * Random.lastValue + Random.increment) % Random.modulus;
-    return Random.lastValue%start + (end-start);    
+    return Random.lastValue%end + start;    
 }
 
  static seed(seed: number): void {

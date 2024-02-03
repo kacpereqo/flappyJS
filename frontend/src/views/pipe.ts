@@ -20,7 +20,7 @@ export class Pipe{
         this.sizeX = 52;
         this.sizeY = 320;
 
-        this.y = Random.random(0,200);
+        this.y = Random.random(0, 200);
         if (posX) {
             this.x = posX;
         }
