@@ -1,6 +1,6 @@
 <template>
   <main>
-    <div class="canvas" ref="canvasContainer">
+    <div id="canvas-container" ref="canvasContainer">
       <canvas ref="canvas" width="800" height="500" />
       <div id="ground" />
     </div>
@@ -50,12 +50,13 @@ main {
 
 #chat-container {
   width: 300px;
-  height: 500px;
+  height: 612px;
+  flex-shrink: 0;
   border: 1px solid black;
-  overflow-y: scroll;
 }
 
-.canvas {
+#canvas-container {
+  flex: 1;
   width: 100%;
   height: 100%;
   display: flex;

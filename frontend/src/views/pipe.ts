@@ -1,6 +1,7 @@
 import pipeImg from '../public/game/pipe-green.png';
 import reversedPipeImg from '../public/game/pipe-green-reversed.png';
 import { Player } from './player';
+import { Random } from '@/utils/random';
 
 export class Pipe{
     x: number;
@@ -19,7 +20,7 @@ export class Pipe{
         this.sizeX = 52;
         this.sizeY = 320;
 
-        this.y = Math.floor(Math.random() * 200);
+        this.y = Random.random(0,200);
         if (posX) {
             this.x = posX;
         }

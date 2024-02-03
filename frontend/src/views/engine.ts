@@ -4,6 +4,7 @@ import { SocketConnection } from "./websockets";
 import backgroundImage from "@/public/game/background-day.png";
 import { playersStore } from "@/stores/players";
 import { userStore } from "@/stores/user";
+import { Random } from "@/utils/random";
 
 const background = new Image();
 background.src = backgroundImage;
@@ -161,6 +162,8 @@ export class Engine{
       }
     
     init(): void {
+      Random.seed(0);
+
       for (let i = 1 ; i < 11; i++)
       {
           this.pipes.push(new Pipe(this.canvas, 200 * i ));
