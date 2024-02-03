@@ -24,7 +24,7 @@ export class Pipe{
             this.x = posX;
         }
         else{
-            this.x = canvas.width/2 + this.sizeX ;
+            this.x = 2000;
         }
 
         this.pipeImg = new Image();

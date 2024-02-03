@@ -154,13 +154,18 @@ export class Engine{
       
         this.renderScore(this.canvas);
       }
-    addPipe(): any {
+    addPipe(): number {
         return setInterval(() => {
-            this.pipes.push(new Pipe(this.canvas));
+            this.pipes.push(new Pipe(this.canvas, 2000));
             }, 2000);
       }
     
     init(): void {
+      for (let i = 1 ; i < 11; i++)
+      {
+          this.pipes.push(new Pipe(this.canvas, 200 * i ));
+      }
+      
         this.timeouts.push(this.addPipe());
     }
 
@@ -171,6 +176,7 @@ export class Engine{
         players.forEach((player) => player.reset());
 
         this.pipes = [];
+
         this.timeouts.forEach((timeout) => clearTimeout(timeout));
         
         this.init();
