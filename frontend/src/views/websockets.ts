@@ -1,7 +1,6 @@
 import { websocketStore } from "../stores/websocket";
 import { userStore } from "../stores/user";
-import { useRoute } from "vue-router";
-import {watch } from 'vue';
+import { playersStore } from "@/stores/players";
 
 
 export class SocketConnection {
@@ -9,13 +8,15 @@ export class SocketConnection {
     private static instance: SocketConnection|  null = null;
     public webSocket: WebSocket;
     public userStore: any;
+    private playersStore: any; 
 
     private constructor() {
 
-        console.log("constructor");
 
         const store = websocketStore();
         this.userStore = userStore();
+        this.playersStore = playersStore();
+
         this.webSocket = new WebSocket(store.getAdress());
         
         this.webSocket.onopen = () => {
@@ -24,6 +25,7 @@ export class SocketConnection {
     
         window.addEventListener("popstate", () => {
             this.webSocket.close();
+            this.playersStore.reset();
             SocketConnection.instance = null;
         });
     }
@@ -53,7 +55,7 @@ export class SocketConnection {
         this.send({type: "score", score: score});
     }
 
-    public sendDead() {
-        this.send({type: "dead"});
+    public sendDead(newSeed: number) {
+        this.send({type: "dead", "newSeed" : newSeed});
     }
 }

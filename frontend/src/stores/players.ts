@@ -23,7 +23,13 @@ export const playersStore = defineStore('players', () => {
         if (player) {
             player.score++;
         }
+
+        players.value.sort((a, b) => b.score - a.score);
     }
 
-    return { players, addPlayer, getPlayer, removePlayer, addScore }
+    function reset(){
+        players.value = []
+    }
+
+    return { players, addPlayer, getPlayer, removePlayer, addScore, reset }
 })

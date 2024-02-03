@@ -39,7 +39,6 @@ export class Player {
     constructor(nickname: string, id : number | null = null) {
         const user = userStore();
 
-        console.log("constructor player", nickname, id)
         
         if (id) {
             this.playerId = id;
