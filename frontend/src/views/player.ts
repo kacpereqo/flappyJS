@@ -75,9 +75,9 @@ export class Player {
     }
 
     loadSprites(skinId:number): void {
-        this.spriteUpFlap.src = `/src/public/game/skins/${skinId}-upflap.png`;
-        this.spriteMidFlap.src = `/src/public/game/skins/${skinId}-midflap.png`;
-        this.spriteDownFlap.src = `/src/public/game/skins/${skinId}-downflap.png`;
+        this.spriteUpFlap.src = `/${skinId}-upflap.png`;
+        this.spriteMidFlap.src = `/${skinId}-midflap.png`;
+        this.spriteDownFlap.src = `/${skinId}-downflap.png`;
     }
 
     connect(): void {

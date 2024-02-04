@@ -36,13 +36,13 @@ function toogleSkin() {
   if (skinImg.value == null) return;
 
   if (skinState.value === 0) {
-    skinImg.value.src = `/src/public/game/skins/${currentSkinId.value}-downflap.png`;
+    skinImg.value.src = `/${currentSkinId.value}-downflap.png`;
     skinState.value = 1;
   } else if (skinState.value === 1) {
-    skinImg.value.src = `/src/public/game/skins/${currentSkinId.value}-midflap.png`;
+    skinImg.value.src = `/${currentSkinId.value}-midflap.png`;
     skinState.value = 2;
   } else {
-    skinImg.value.src = `/src/public/game/skins/${currentSkinId.value}-upflap.png`;
+    skinImg.value.src = `/${currentSkinId.value}-upflap.png`;
     skinState.value = 0;
   }
 }
