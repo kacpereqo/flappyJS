@@ -112,13 +112,16 @@ export class Engine{
           break;
 
           case "dead":
-          Random.seed(data.newSeed);
-          this.reset();
-        break;
-
-        case "win":
-          console.log(this.playersStore.players);
-          this.playersStore.addScore(data.id);
+            this.players?.forEach((player) => {
+              if (player.playerId === data.id) {
+                player.dead = true;
+              }
+            });
+          break;
+            case "win":
+            Random.seed(data.newSeed);
+            this.playersStore.addScore(data.id);
+            this.reset();
         break;
   }
 }
@@ -217,10 +220,18 @@ export class Engine{
     }
 
     reset(): void {
-        
       const players =  [...this.players, this.mainPlayer];
 
-        players.forEach((player) => player.reset());
+        players.forEach((player) => {
+            player.x = -200;
+            player.y = 0;
+            player.velocity = 0;
+            player.dead = false;
+            player.score = 0;
+        
+        });
+
+        players.forEach((player) => {console.log(player.dead)})
 
         this.pipes = [];
 
@@ -253,11 +264,10 @@ export class Engine{
       
         // --- Player Collision--- //
         for (const pipe of this.pipes) {
-          if (pipe.collide(this.mainPlayer, this.canvas)) {
-            const newSeed = Math.floor(Math.random() * 100000);
-            Random.seed(newSeed);
-            this.mainPlayer.webSocket?.sendDead(newSeed);
-            this.reset();
+          if (pipe.collide(this.mainPlayer, this.canvas) && !this.mainPlayer.dead) {
+            this.mainPlayer.dead = true;
+            this.mainPlayer.webSocket?.sendDead();
+            // this.reset();
             break;
           } else if (pipe.x < this.mainPlayer.x && !pipe.passed) {
             pipe.passed = true;

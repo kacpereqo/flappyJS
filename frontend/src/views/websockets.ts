@@ -55,7 +55,7 @@ export class SocketConnection {
         this.send({type: "score", score: score});
     }
 
-    public sendDead(newSeed: number) {
-        this.send({type: "dead", "newSeed" : newSeed});
+    public sendDead() {
+        this.send({type: "dead"});
     }
 }

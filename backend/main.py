@@ -1,3 +1,5 @@
+import random
+
 import orjson
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from uvicorn import run
@@ -79,23 +81,36 @@ class EventHandler:
         client_id = parsed_data["id"]
         players[room_id][client_id].is_dead = True
 
-        if len(players[room_id]) > 1:
-            won_player = list(
-                filter(lambda x: not x.is_dead, players[room_id].values())
+        won_player = list(filter(lambda x: not x.is_dead, players[room_id].values()))
+        if len(won_player) == 1:
+            won_player[0].score += 1
+
+            for player in players[room_id].values():
+                print(player.score, player.nickname)
+
+            for player in players[room_id].values():
+                player.is_dead = False
+            print(won_player[0].player_id, "won")
+            await manager.broadcast(
+                orjson.dumps(
+                    {
+                        "type": "win",
+                        "id": won_player[0].player_id,
+                        "newSeed": random.randint(0, 10000),
+                    }
+                ).decode("utf-8")
             )
-            if len(won_player) == 1:
-                won_player[0].score += 1
 
-                for player in players[room_id].values():
-                    print(player.score, player.nickname)
-
-                for player in players[room_id].values():
-                    player.is_dead = False
-                await manager.broadcast(
-                    orjson.dumps({"type": "win", "id": won_player[0].player_id}).decode(
-                        "utf-8"
-                    )
-                )
+        elif len(won_player) == 0:
+            await manager.broadcast(
+                orjson.dumps(
+                    {
+                        "type": "win",
+                        "id": client_id,
+                        "newSeed": random.randint(0, 10000),
+                    }
+                ).decode("utf-8")
+            )
 
 
 players: dict[int, dict[int, Player]] = {}  # room_id: {player_id: Player}

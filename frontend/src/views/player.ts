@@ -85,6 +85,8 @@ export class Player {
     }
 
     update(dt:number): void {
+        // if (this.dead) return;
+
         this.y += this.velocity * dt;
         this.velocity += this.acceleration * dt;
 
