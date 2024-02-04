@@ -33,21 +33,19 @@ manager = ConnectionManager()
 
 
 class Player:
-    def __init__(self, player_id: int, nickname: str = "guest"):
+    def __init__(self, player_id: int, skinId: int, nickname: str = "guest"):
         self.player_id = player_id
         self.nickname = nickname
         self.score = 0
         self.is_dead = False
+        self.skinId = skinId
 
 
 class EventHandler:
     @staticmethod
     async def onJoin(websocket: WebSocket, room_id: int, parsed_data: dict):
-        client_id = parsed_data["id"]
-        nickname = parsed_data["nickname"]
 
         for player in players[room_id].values():
-            print(player.player_id)
             await manager.send_personal_message(
                 orjson.dumps(
                     {
@@ -55,12 +53,17 @@ class EventHandler:
                         "id": player.player_id,
                         "nickname": player.nickname,
                         "score": player.score,
+                        "skinId": player.skinId,
                     }
                 ).decode("utf-8"),
                 websocket,
             )
 
-        players[room_id][client_id] = Player(client_id, nickname)
+        client_id = parsed_data["id"]
+        nickname = parsed_data["nickname"]
+        skinId = parsed_data["skinId"]
+
+        players[room_id][client_id] = Player(client_id, skinId, nickname)
 
     @staticmethod
     async def onDisconnect(websocket, room_id: int, client_id: int):

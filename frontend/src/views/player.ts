@@ -1,6 +1,3 @@
-import downflap from '../public/game/bluebird-downflap.png'
-import midflap from '../public/game/bluebird-midflap.png'
-import upflap from '../public/game/bluebird-upflap.png'
 import { SocketConnection } from './websockets';
 import { userStore } from '../stores/user';
 
@@ -36,10 +33,9 @@ export class Player {
 
     webSocket: SocketConnection | null;
  
-    constructor(nickname: string, id : number | null = null) {
+    constructor(nickname: string, id : number | null = null, skinId:number) {
         const user = userStore();
 
-        
         if (id) {
             this.playerId = id;
         }
@@ -60,13 +56,9 @@ export class Player {
         this.velocity = 0;
 
         this.spriteUpFlap = new Image();
-        this.spriteUpFlap.src = upflap;
-
         this.spriteMidFlap = new Image();
-        this.spriteMidFlap.src = midflap;
-
         this.spriteDownFlap = new Image();
-        this.spriteDownFlap.src = downflap;
+        this.loadSprites(skinId);
 
         this.lastTimeJumped = 0;
 
@@ -80,6 +72,12 @@ export class Player {
         this.keyDown = false;
 
         this.webSocket = null;
+    }
+
+    loadSprites(skinId:number): void {
+        this.spriteUpFlap.src = `/src/public/game/skins/${skinId}-upflap.png`;
+        this.spriteMidFlap.src = `/src/public/game/skins/${skinId}-midflap.png`;
+        this.spriteDownFlap.src = `/src/public/game/skins/${skinId}-downflap.png`;
     }
 
     connect(): void {
@@ -133,6 +131,12 @@ export class Player {
 
         ctx?.save();
 
+        ctx!.font = "20px Arial";
+        ctx!.fillStyle = "black";
+        ctx!.textAlign = "center";
+        ctx?.fillText(this.nickname, this.x + this.sizeX/2, this.y - 30);
+
+
         ctx?.translate(this.x + this.sizeX, this.y + this.sizeY);
         this.rotate(ctx);
         ctx?.translate(-(this.x + this.sizeX), -(this.y + this.sizeY));
@@ -171,15 +175,6 @@ export class Player {
     
         this.acceleration = 1200;
         this.velocity = 0;
-    
-        this.spriteUpFlap = new Image();
-        this.spriteUpFlap.src = upflap;
-    
-        this.spriteMidFlap = new Image();
-        this.spriteMidFlap.src = midflap;
-    
-        this.spriteDownFlap = new Image();
-        this.spriteDownFlap.src = downflap;
     
         this.lastTimeJumped = 0;
     

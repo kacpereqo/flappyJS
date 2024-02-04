@@ -44,7 +44,7 @@ export class SocketConnection {
     }
 
     private sendJoin() {
-        this.send({type: "join", nickname: this.userStore.nickname});
+        this.send({type: "join", nickname: this.userStore.nickname, skinId: this.userStore.skinId});
     }
 
     public sendJump(posY: number) {

@@ -21,6 +21,8 @@
         ref="roomIdInput"
       />
 
+      <skinGallery ref="skin" />
+
       <input type="submit" value="Submit" />
     </form>
   </main>
@@ -31,6 +33,7 @@ import { userStore } from "@/stores/user";
 import { useRouter } from "vue-router";
 import { websocketStore } from "@/stores/websocket";
 import { onMounted, ref } from "vue";
+import skinGallery from "@/components/skinGallery.vue";
 
 const router = useRouter();
 const user = userStore();
@@ -39,6 +42,7 @@ const websocket = websocketStore();
 const serverAdressInput = ref<HTMLInputElement | null>(null);
 const nickInput = ref<HTMLInputElement | null>(null);
 const roomIdInput = ref<HTMLInputElement | null>(null);
+const skin = ref<typeof skinGallery | null>(null);
 
 onMounted(() => {
   serverAdressInput.value!.value = "ws://localhost:8000/ws";
@@ -48,6 +52,7 @@ onMounted(() => {
 
 function onSubmit() {
   user.nickname = nickInput.value?.value!;
+  user.skinId = skin.value?.getSkinId();
   websocket.setAdress(serverAdressInput.value?.value!);
 
   router.push({

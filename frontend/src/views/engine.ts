@@ -45,7 +45,8 @@ export class Engine{
         this.canvas = canvas;
         this.mainPlayer = new Player(
             this.userStore.nickname,
-            this.userStore.id
+            this.userStore.id,
+            this.userStore.skinId
         );
 
         this.lastFrame = 0;
@@ -85,9 +86,9 @@ export class Engine{
 
         switch (data.type) {
           case "join":
-            console.log(data);
+            console.log("join", data.skinId);
             if (data.id !== this.mainPlayer.playerId) {
-              this.players?.push(new Player( data.nickname, data.id));
+              this.players?.push(new Player( data.nickname, data.id, data.skinId));
               this.playersStore.addPlayer({id: data.id, nickname: data.nickname, score: data.score ? data.score : 0});
             }
           break;
@@ -116,7 +117,6 @@ export class Engine{
         break;
 
         case "win":
-          console.log(data);
           console.log(this.playersStore.players);
           this.playersStore.addScore(data.id);
         break;
@@ -167,9 +167,9 @@ export class Engine{
         // @ts-ignore
         const players =  [...this.players, this.mainPlayer];
         
-        players.forEach((player) => player.render(this.canvas));
         this.pipes.forEach((pipe) => pipe.render(this.canvas));
-      
+        
+        players.forEach((player) => player.render(this.canvas));
         this.renderScore(this.canvas);
 
       }

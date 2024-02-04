@@ -56,7 +56,7 @@ export class Pipe{
     }
 
     collide(player: Player, canvas: HTMLCanvasElement): boolean {
-        if (player.x + player.sizeX/2 > this.x && player.x < this.x + this.sizeX) {
+        if (player.x + player.sizeX > this.x && player.x < this.x + this.sizeX) {
             if (player.y+player.sizeY > this.y || player.y < this.y - 200  ) {
                 return true;
             }
