@@ -1,7 +1,7 @@
 import { Player } from "./player";
 import { Pipe } from "./pipe";
 import { SocketConnection } from "./websockets";
-import backgroundImage from "@/public/game/background-day.png";
+import backgroundImage from "@/public/background-day.png";
 import { playersStore } from "@/stores/players";
 import { userStore } from "@/stores/user";
 import { Random } from "@/utils/random";

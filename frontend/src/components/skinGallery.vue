@@ -12,7 +12,7 @@
     <div class="skin">
       <img
         :src="`/src/public/game/skins/${currentSkinId}-upflap.png`"
-        alt="skin"
+        alt="loading..."
         ref="skinImg"
       />
     </div>
@@ -32,17 +32,19 @@ const currentSkinId = ref(2);
 const skinState = ref(0);
 const skinImg = ref<HTMLImageElement | null>(null);
 
+const publicPath = !import.meta.env.DEV ? "/" : "src/public/";
+
 function toogleSkin() {
   if (skinImg.value == null) return;
 
   if (skinState.value === 0) {
-    skinImg.value.src = `/${currentSkinId.value}-downflap.png`;
+    skinImg.value.src = `${publicPath}/skins/${currentSkinId.value}-downflap.png`;
     skinState.value = 1;
   } else if (skinState.value === 1) {
-    skinImg.value.src = `/${currentSkinId.value}-midflap.png`;
+    skinImg.value.src = `${publicPath}/skins/${currentSkinId.value}-midflap.png`;
     skinState.value = 2;
   } else {
-    skinImg.value.src = `/${currentSkinId.value}-upflap.png`;
+    skinImg.value.src = `${publicPath}/skins/${currentSkinId.value}-upflap.png`;
     skinState.value = 0;
   }
 }

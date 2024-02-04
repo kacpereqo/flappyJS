@@ -75,9 +75,11 @@ export class Player {
     }
 
     loadSprites(skinId:number): void {
-        this.spriteUpFlap.src = `/${skinId}-upflap.png`;
-        this.spriteMidFlap.src = `/${skinId}-midflap.png`;
-        this.spriteDownFlap.src = `/${skinId}-downflap.png`;
+        const publicPath = !import.meta.env.DEV ? "/" : "src/public/";
+        console.log(publicPath);
+        this.spriteUpFlap.src=  `/skins/${skinId}-upflap.png`;
+        this.spriteMidFlap.src = `/skins/${skinId}-midflap.png`;
+        this.spriteDownFlap.src = `/skins/${skinId}-downflap.png`;
     }
 
     connect(): void {

@@ -1,5 +1,5 @@
-import pipeImg from '../public/game/pipe-green.png';
-import reversedPipeImg from '../public/game/pipe-green-reversed.png';
+import pipeImg from '@/public/pipe-green.png';
+import reversedPipeImg from '@/public/pipe-green-reversed.png';
 import { Player } from './player';
 import { Random } from '@/utils/random';
 

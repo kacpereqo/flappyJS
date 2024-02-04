@@ -74,7 +74,7 @@ main {
 
 #ground {
   width: 100%;
-  background-image: url("/src/public/game/base.png");
+  background-image: url("/src/public/base.png");
   background-color: red;
   height: 112px;
   animation: groundTransition 3.36s linear infinite reverse;
