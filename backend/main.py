@@ -134,4 +134,11 @@ async def websocket_endpoint(
 
 
 if __name__ == "__main__":
-    run("main:app", reload=True)
+    run(
+        "main:app",
+        reload=True,
+        # port=8000,
+        # host="127.0.0.1",
+        # ssl_certfile="./cert.pem",
+        # ssl_keyfile="./key.pem",
+    )
