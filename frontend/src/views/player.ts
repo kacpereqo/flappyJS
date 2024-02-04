@@ -1,6 +1,19 @@
 import { SocketConnection } from './websockets';
 import { userStore } from '../stores/user';
 
+import blue_upflap from "@/public/skins/0-upflap.png";
+import blue_midflap from "@/public/skins/0-midflap.png";
+import blue_downflap from "@/public/skins/0-downflap.png";
+
+import red_upflap from "@/public/skins/1-upflap.png";
+import red_midflap from "@/public/skins/1-midflap.png";
+import red_downflap from "@/public/skins/1-downflap.png";
+
+import yellow_upflap from "@/public/skins/2-upflap.png";
+import yellow_midflap from "@/public/skins/2-midflap.png";
+import yellow_downflap from "@/public/skins/2-downflap.png";
+
+
 export class Player {
     x: number;
     y: number;
@@ -75,11 +88,21 @@ export class Player {
     }
 
     loadSprites(skinId:number): void {
-        const publicPath = !import.meta.env.DEV ? "/" : "src/public/";
-        console.log(publicPath);
-        this.spriteUpFlap.src=  `/skins/${skinId}-upflap.png`;
-        this.spriteMidFlap.src = `/skins/${skinId}-midflap.png`;
-        this.spriteDownFlap.src = `/skins/${skinId}-downflap.png`;
+        if (skinId === 0) {
+            this.spriteUpFlap.src = blue_upflap;
+            this.spriteMidFlap.src = blue_midflap;
+            this.spriteDownFlap.src = blue_downflap;
+        }
+        else if (skinId === 1) {
+            this.spriteUpFlap.src = red_upflap;
+            this.spriteMidFlap.src = red_midflap;
+            this.spriteDownFlap.src = red_downflap;
+        }
+        else if (skinId === 2) {
+            this.spriteUpFlap.src = yellow_upflap;
+            this.spriteMidFlap.src = yellow_midflap;
+            this.spriteDownFlap.src = yellow_downflap;
+        }
     }
 
     connect(): void {

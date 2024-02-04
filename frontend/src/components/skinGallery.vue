@@ -28,23 +28,51 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 
+import blue_upflap from "@/public/skins/0-upflap.png";
+import blue_midflap from "@/public/skins/0-midflap.png";
+import blue_downflap from "@/public/skins/0-downflap.png";
+
+import red_upflap from "@/public/skins/1-upflap.png";
+import red_midflap from "@/public/skins/1-midflap.png";
+import red_downflap from "@/public/skins/1-downflap.png";
+
+import yellow_upflap from "@/public/skins/2-upflap.png";
+import yellow_midflap from "@/public/skins/2-midflap.png";
+import yellow_downflap from "@/public/skins/2-downflap.png";
+
 const currentSkinId = ref(2);
 const skinState = ref(0);
 const skinImg = ref<HTMLImageElement | null>(null);
-
-const publicPath = !import.meta.env.DEV ? "/" : "src/public/";
 
 function toogleSkin() {
   if (skinImg.value == null) return;
 
   if (skinState.value === 0) {
-    skinImg.value.src = `${publicPath}/skins/${currentSkinId.value}-downflap.png`;
+    if (currentSkinId.value === 0) {
+      skinImg.value.src = blue_midflap;
+    } else if (currentSkinId.value === 1) {
+      skinImg.value.src = red_midflap;
+    } else {
+      skinImg.value.src = yellow_midflap;
+    }
     skinState.value = 1;
   } else if (skinState.value === 1) {
-    skinImg.value.src = `${publicPath}/skins/${currentSkinId.value}-midflap.png`;
+    if (currentSkinId.value === 0) {
+      skinImg.value.src = blue_downflap;
+    } else if (currentSkinId.value === 1) {
+      skinImg.value.src = red_downflap;
+    } else {
+      skinImg.value.src = yellow_downflap;
+    }
     skinState.value = 2;
   } else {
-    skinImg.value.src = `${publicPath}/skins/${currentSkinId.value}-upflap.png`;
+    if (currentSkinId.value === 0) {
+      skinImg.value.src = blue_upflap;
+    } else if (currentSkinId.value === 1) {
+      skinImg.value.src = red_upflap;
+    } else {
+      skinImg.value.src = yellow_upflap;
+    }
     skinState.value = 0;
   }
 }
