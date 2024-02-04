@@ -25,6 +25,13 @@ export class Engine{
     playersStore: any;
     userStore: any;
 
+    stopRendering: boolean;
+
+    lastFrame: number;
+    lag: number;
+
+    fps: number;
+
     constructor(canvas: HTMLCanvasElement){
         this.dt = 1/60;
         this.clock = 0;
@@ -41,27 +48,31 @@ export class Engine{
             this.userStore.id
         );
 
+        this.lastFrame = 0;
+        this.lag = 0;
+
+        this.stopRendering = false;
+
         this.websocket = SocketConnection.getInstance();
         this.listenOnSocket();
         
         this.mainPlayer.connect();
        
         this.playersStore.addPlayer({id: this.mainPlayer.playerId, nickname: this.mainPlayer.nickname, score: 0});
+        this.init();
+
+        this.fps = 0;
     }
 
     input(): void {
         this.mainPlayer.controls();
     }
 
-    gameLoop() : void{ {
-        this.init();
-        setInterval(() => {
-                this.clock += this.dt;
-                this.update();
-                this.render();
-                this.input();
-            }, 1000 / 120);
-          }
+    gameLoop() : void{
+      requestAnimationFrame(this.gameLoop.bind(this));
+      this.update();
+      this.render();
+      this.input();
     }
 
     listenOnSocket(): void {
@@ -160,6 +171,7 @@ export class Engine{
         this.pipes.forEach((pipe) => pipe.render(this.canvas));
       
         this.renderScore(this.canvas);
+
       }
     addPipe(): number {
         return setInterval(() => {
@@ -167,15 +179,41 @@ export class Engine{
             }, 2000);
       }
     
+    animationStart(): Promise<any> {
+
+        return new Promise((resolve) => {
+            const ctx = this.canvas.getContext("2d");
+            ctx!.translate(this.canvas.width / 2, this.canvas.height / 2);
+            if (!ctx) return;
+            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            ctx.font = "bold 48px sans-serif";
+            ctx.fillStyle = "white";
+            ctx.fillText("Get ready", 0, 0);
+            ctx!.translate(-this.canvas.width / 2, -this.canvas.height / 2);
+            setTimeout(resolve, 3000);
+        });
+    }
+
     init(): void {
-      Random.seed(0);
+
+
 
       for (let i = 1 ; i < 11; i++)
       {
           this.pipes.push(new Pipe(this.canvas, 200 * i ));
       }
-      
-        this.timeouts.push(this.addPipe());
+
+      // this.animationStart().then(
+      //   ()=>{
+      //     Random.seed(0);
+      //     this.timeouts.push(this.addPipe());
+      //     console.log("animation end");
+
+      //     this.stopRendering = false;
+      //   }
+      // )
+
+          this.timeouts.push(this.addPipe());
     }
 
     reset(): void {
@@ -192,6 +230,8 @@ export class Engine{
     }
 
     update(): void {
+
+        if (this.stopRendering) return;
 
         // --- Player --- //
 
