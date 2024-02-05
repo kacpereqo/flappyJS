@@ -5,6 +5,7 @@ import backgroundImage from "@/public/background-day.png";
 import { playersStore } from "@/stores/players";
 import { userStore } from "@/stores/user";
 import { Random } from "@/utils/random";
+import { RenderEngine } from "./renderEngine";
 
 const background = new Image();
 background.src = backgroundImage;
@@ -30,7 +31,8 @@ export class Engine{
     lastFrame: number;
     lag: number;
 
-    fps: number;
+
+    renderEngine: RenderEngine;
 
     constructor(canvas: HTMLCanvasElement){
         this.dt = 1/60;
@@ -60,9 +62,35 @@ export class Engine{
         this.mainPlayer.connect();
        
         this.playersStore.addPlayer({id: this.mainPlayer.playerId, nickname: this.mainPlayer.nickname, score: 0});
+
+        this.renderEngine = new RenderEngine(canvas);
+
+        this.renderEngine.addLayer({
+            renderFunction: () => this.renderBackground(canvas),
+            zIndex: 0,
+            key: "background"
+        })
+
+        this.renderEngine.addLayer({
+            renderFunction: () => this.renderPlayers(),
+            zIndex: 2,
+            key: "players"
+        })
+
+        this.renderEngine.addLayer({
+            renderFunction: () => this.renderPipes(),
+            zIndex: 1,
+            key: "pipes"
+        })
+
+        this.renderEngine.addLayer({
+            renderFunction: () => this.renderScore(canvas),
+            zIndex: 3,
+            key: "score"
+        })
+
         this.init();
 
-        this.fps = 0;
     }
 
     input(): void {
@@ -72,7 +100,7 @@ export class Engine{
     gameLoop() : void{
       requestAnimationFrame(this.gameLoop.bind(this));
       this.update();
-      this.render();
+      this.renderEngine.render();
       this.input();
     }
 
@@ -130,18 +158,19 @@ export class Engine{
   }
 
     renderBackground(canvas: HTMLCanvasElement) {
+      // ctx?.drawImage(this.sprite, this.x, this.y, this.sizeX, this.sizeY);
+
         const ctx = canvas.getContext("2d");
+
+        ctx?.save();
+
         for (let i = 0; i < canvas.width / 288 + 1; i++) {
           ctx?.drawImage(
             background,
-            0,
-            0,
-            canvas.width,
-            canvas.height,
-            (i - 1) * 287 + ((this.clock * 20) % 288),
-            0,
-            canvas.width,
-            canvas.height
+            -canvas.width / 2 + i * 288,
+            -canvas.height / 2,
+            288,
+            512,
           );
         }
       }
@@ -155,51 +184,69 @@ export class Engine{
         ctx.fillText(this.mainPlayer.score.toString(), 0, -canvas.height / 2 + 50);
         // ctx.fillText(this.players.length.toString(), 0, -canvas.height / 2 + 50);
       
-        ctx?.translate(-canvas.width / 2, -canvas.height / 2);
       }
 
-    render(): void {
-        const ctx = this.canvas.getContext("2d");
-        if (!ctx || !this.canvas) return;
+    
+    renderPlayers(): void {
+    
+      const players =  [...this.players!, this.mainPlayer];
+      players.forEach((player) => player.render(this.canvas));
+      
+    }
 
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      
-        this.renderBackground(this.canvas);
-      
-        ctx?.translate(this.canvas.width / 2, this.canvas.height / 2);
-      
-        // @ts-ignore
-        const players =  [...this.players, this.mainPlayer];
-        
-        this.pipes.forEach((pipe) => pipe.render(this.canvas));
-        
-        players.forEach((player) => player.render(this.canvas));
-        this.renderScore(this.canvas);
+    renderPipes(): void {
+      this.pipes.forEach((pipe) => pipe.render(this.canvas));
+    }
 
-      }
+
     addPipe(): number {
         return setInterval(() => {
             this.pipes.push(new Pipe(this.canvas, 2000));
             }, 2000);
       }
     
-    animationStart(): Promise<any> {
+    animationStart():void {
 
-        return new Promise((resolve) => {
-            const ctx = this.canvas.getContext("2d");
-            ctx!.translate(this.canvas.width / 2, this.canvas.height / 2);
-            if (!ctx) return;
-            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-            ctx.font = "bold 48px sans-serif";
+        // get ready to start the game
+
+        const ctx = this.canvas.getContext('2d');
+        if (!ctx || !this.canvas) return;
+
+        const height = 150;
+        let current = 3;
+
+
+
+        this.renderEngine.addLayer({
+          renderFunction: () => {
+            ctx.fillStyle = "black";
+            ctx.fillRect(-this.canvas.width/2, -height/2 - 5, this.canvas.width, height+10);
             ctx.fillStyle = "white";
-            ctx.fillText("Get ready", 0, 0);
-            ctx!.translate(-this.canvas.width / 2, -this.canvas.height / 2);
-            setTimeout(resolve, 3000);
+            ctx.fillRect(-this.canvas.width/2, -height/2, this.canvas.width, height);
+          },
+          zIndex: 99,
+          key: "startAnimation"
         });
+
+        ctx.font = "bold 48px sans-serif";
+        
+        this.renderEngine.addLayer({
+        
+        renderFunction: () => {ctx.fillStyle = "black";ctx.fillText(current.toString(), 0, 10);},
+          zIndex: 100,
+          key: "startAnimation"
+        });
+
+        const interval = setInterval(() => {
+          current--;
+          if (current === 0) {
+            clearInterval(interval);
+            this.renderEngine.removeLayer("startAnimation");
+          }
+        }, 500);
     }
 
     init(): void {
-
 
 
       for (let i = 1 ; i < 11; i++)
@@ -207,32 +254,27 @@ export class Engine{
           this.pipes.push(new Pipe(this.canvas, 200 * i ));
       }
 
-      // this.animationStart().then(
-      //   ()=>{
-      //     Random.seed(0);
-      //     this.timeouts.push(this.addPipe());
-      //     console.log("animation end");
+      this.stopRendering = true;
+      this.renderEngine.addLayer({
+        renderFunction: () => this.animationStart(),
+        zIndex: 10,
+        key: "animation",
+        callOnce: true,
+      })
 
-      //     this.stopRendering = false;
-      //   }
-      // )
+      setTimeout(() => {
+        this.timeouts.push(this.addPipe());
+        this.stopRendering = false;
+      }
+      , 1500);
 
-          this.timeouts.push(this.addPipe());
     }
 
     reset(): void {
-      const players =  [...this.players, this.mainPlayer];
+      const players =  [...this.players!, this.mainPlayer];
 
-        players.forEach((player) => {
-            player.x = -200;
-            player.y = 0;
-            player.velocity = 0;
-            player.dead = false;
-            player.score = 0;
-        
-        });
+        players.forEach((player) => player!.reset());
 
-        players.forEach((player) => {console.log(player.dead)})
 
         this.pipes = [];
 
@@ -242,9 +284,7 @@ export class Engine{
     }
 
     update(): void {
-
         if (this.stopRendering) return;
-
         // --- Player --- //
 
         // @ts-ignore

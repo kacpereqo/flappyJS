@@ -29,6 +29,9 @@ onMounted(() => {
   canvas.value!.width = canvasContainer.value?.clientWidth!;
   window.addEventListener("resize", () => {
     canvas.value!.width = canvasContainer.value?.clientWidth!;
+    const ctx = canvas.value?.getContext("2d");
+
+    ctx?.translate(canvas.value!.width / 2, canvas.value!.height / 2);
   });
   const engine = new Engine(canvas?.value!);
   engine.gameLoop();

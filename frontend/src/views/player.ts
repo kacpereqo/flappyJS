@@ -169,11 +169,10 @@ export class Player {
         ctx?.translate(-(this.x + this.sizeX), -(this.y + this.sizeY));
 
 
-        if (this.hitbox) {
-            ctx?.fillRect(this.x, this.y, this.sizeX, this.sizeY);
-        }
         ctx?.drawImage(this.sprite, this.x, this.y, this.sizeX, this.sizeY);
         ctx?.restore();
+
+
     }
 
     controls(): void {
