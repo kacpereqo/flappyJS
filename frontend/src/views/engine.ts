@@ -106,6 +106,7 @@ export class Engine{
           case "jump":
             this.players?.forEach((player) => {
               if (player.playerId === data.id) {
+                player.y = data.y;
                 player.jump();
               }
             });
