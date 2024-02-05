@@ -308,7 +308,6 @@ export class Engine{
           if (pipe.collide(this.mainPlayer, this.canvas) && !this.mainPlayer.dead) {
             this.mainPlayer.dead = true;
             this.mainPlayer.webSocket?.sendDead();
-            // this.reset();
             break;
           } else if (pipe.x < this.mainPlayer.x && !pipe.passed) {
             pipe.passed = true;

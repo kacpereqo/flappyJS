@@ -110,7 +110,7 @@ export class Player {
     }
 
     update(dt:number): void {
-        // if (this.dead) return;
+        if (this.dead) return;
 
         this.y += this.velocity * dt;
         this.velocity += this.acceleration * dt;
@@ -152,6 +152,7 @@ export class Player {
     }
 
     render(canvas:HTMLCanvasElement): void {
+        if (this.dead) return;
 
         const ctx = canvas.getContext('2d');
         this.animation();
