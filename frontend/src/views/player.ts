@@ -13,6 +13,11 @@ import yellow_upflap from "@/public/skins/2-upflap.png";
 import yellow_midflap from "@/public/skins/2-midflap.png";
 import yellow_downflap from "@/public/skins/2-downflap.png";
 
+import wingWav from "@/public/wing.wav";
+import swooshWav from "@/public/swoosh.wav";
+import pointWav from "@/public/point.wav";
+import hitWav from "@/public/hit.wav";
+
 
 export class Player {
     x: number;
@@ -40,11 +45,16 @@ export class Player {
 
     score: number;
 
-    dead: boolean;
+    isdead: boolean;
 
     keyDown: boolean;
 
     webSocket: SocketConnection | null;
+
+    wingWav: HTMLAudioElement;
+    swoshWav: HTMLAudioElement;
+    pointWav: HTMLAudioElement;
+    hitWav: HTMLAudioElement;
  
     constructor(nickname: string, id : number | null = null, skinId:number) {
         const user = userStore();
@@ -71,6 +81,12 @@ export class Player {
         this.spriteUpFlap = new Image();
         this.spriteMidFlap = new Image();
         this.spriteDownFlap = new Image();
+
+        this.wingWav = new Audio(wingWav);
+        this.swoshWav = new Audio(swooshWav);
+        this.pointWav = new Audio(pointWav);
+        this.hitWav = new Audio(hitWav);
+
         this.loadSprites(skinId);
 
         this.lastTimeJumped = 0;
@@ -80,7 +96,7 @@ export class Player {
         this.hitbox = false;
         this.score  = 0;
         
-        this.dead = false;
+        this.isdead = false;
 
         this.keyDown = false;
 
@@ -110,7 +126,7 @@ export class Player {
     }
 
     update(dt:number): void {
-        if (this.dead) return;
+        if (this.isdead) return;
 
         this.y += this.velocity * dt;
         this.velocity += this.acceleration * dt;
@@ -133,6 +149,9 @@ export class Player {
 
         this.lastTimeJumped = Date.now();
         this.velocity = -400
+        
+        this.wingWav.currentTime = 0;
+        this.wingWav.play();
     }
 
     animation(): void {
@@ -152,7 +171,7 @@ export class Player {
     }
 
     render(canvas:HTMLCanvasElement): void {
-        if (this.dead) return;
+        if (this.isdead) return;
 
         const ctx = canvas.getContext('2d');
         this.animation();
@@ -210,10 +229,22 @@ export class Player {
         this.hitbox = false;
         this.score  = 0;
         
-        this.dead = false;
+        this.isdead = false;
+    }
+
+    dead():void{
+
+        this.hitWav.currentTime = 0;
+        this.hitWav.play();
+
+        this.isdead = true;
     }
 
     addScore(): void {
+
+        this.pointWav.currentTime = 0;
+        this.pointWav.play();
+
         this.score++;
         this.webSocket?.sendScore(this.score);
     }

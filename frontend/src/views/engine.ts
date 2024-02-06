@@ -143,7 +143,7 @@ export class Engine{
           case "dead":
             this.players?.forEach((player) => {
               if (player.playerId === data.id) {
-                player.dead = true;
+                player.isdead = true;
               }
             });
           break;
@@ -305,8 +305,8 @@ export class Engine{
       
         // --- Player Collision--- //
         for (const pipe of this.pipes) {
-          if (pipe.collide(this.mainPlayer, this.canvas) && !this.mainPlayer.dead) {
-            this.mainPlayer.dead = true;
+          if (pipe.collide(this.mainPlayer, this.canvas) && !this.mainPlayer.isdead) {
+            this.mainPlayer.dead();
             this.mainPlayer.webSocket?.sendDead();
             break;
           } else if (pipe.x < this.mainPlayer.x && !pipe.passed) {

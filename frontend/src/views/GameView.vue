@@ -4,13 +4,13 @@
       <canvas ref="canvas" width="800" height="500" />
       <div id="ground" />
     </div>
-    <!-- <div id="chat-container">
+    <div id="chat-container">
       <ul id="chat">
         <li v-for="player in usePlayerStore.players" :key="player.id">
           {{ player.nickname }} | {{ player.score }}
         </li>
       </ul>
-    </div> -->
+    </div>
   </main>
 </template>
 
